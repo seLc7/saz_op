@@ -18,8 +18,7 @@ def get_content(zipfilename):
     content_dict = dict()
     row_dict = dict()
     name_num = '0001'
-    row_list = []
-    print zfobj.namelist()
+    # print zfobj.namelist()
     for name in zfobj.namelist():
         name = name.replace('\\', '/')
         if name.endswith('/'):
@@ -31,20 +30,27 @@ def get_content(zipfilename):
             name_num = name.split('_')[0]
             if name_num not in content_dict.keys():
                 row_dict = {}
+                # print "if" + name
                 if 'c' in name:
-                    row_dict.update(get_c_content(content))
+                    row_dict = get_c_content(content)
                 if 'm' in name:
-                    row_dict.update(get_m_content(content))
+                    row_dict = get_m_content(content)
                 if 's' in name:
-                    row_dict.update(get_s_content(content))
+                    row_dict = get_s_content(content)
                 content_dict[name_num] = row_dict
+                # print "if" + str(row_dict)
             else:
+                # print "if" + name
                 if 'c' in name:
-                    row_dict.update(get_c_content(content))
+                    row_dict = get_c_content(content)
                 if 'm' in name:
-                    row_dict.update(get_m_content(content))
+                    row_dict = get_m_content(content)
+                    # print "m!!!!!!!!!!"
+                    # print row_dict
                 if 's' in name:
-                    row_dict.update(get_s_content(content))
+                    row_dict = get_s_content(content)
+                content_dict[name_num].update(row_dict)
+                # print "else" + str(row_dict)
 
     # print sorted(content_dict.iteritems())
     for key, value in sorted(content_dict.iteritems()):
@@ -101,14 +107,15 @@ def get_m_content(content):
     content_dict['server_connected_time'] = time_list[4]
     content_dict['client_done_response_time'] = time_list[9]
 
-    temp = content_list[len(content_list) - 3].strip().split(' ')
-    egress_port = temp[2].strip('\"').split('=\"')[1]
-    # print egress_port
-    content_dict['egress_port'] = egress_port
+    # temp = content_list[len(content_list) - 3].strip().split(' ')
+    # egress_port = temp[2].strip('\"').split('=\"')[1]
+    # # print egress_port
+    # content_dict['egress_port'] = egress_port
 
     temp = content_list[len(content_list) - 1].strip().split(' ')
     host_ip = temp[2].strip('\"').split('=\"')[1]
     content_dict['host_ip'] = host_ip
+    print host_ip
     # print temp
 
     return content_dict
@@ -128,40 +135,6 @@ def get_s_content(content):
     # print content_list
     return content_dict
 
-
-def unzip_file(zipfilename, unziptodir):
-    # if not os.path.exists(unziptodir):
-    #     os.mkdir(unziptodir)
-    zfobj = zipfile.ZipFile(zipfilename)
-    for name in zfobj.namelist():
-
-        name = name.replace('\\', '/')
-        print(name)
-        if name.endswith('/'):
-            # os.mkdir(os.path.join(unziptodir, name))
-            continue
-        else:
-            file = zfobj.read(name)
-            # file = str(file)
-            # file = bytes.decode(file)
-            # file = file.split(b'\r\n')
-            # file += 'aaaaaaaaaaa'
-            newstr = file.decode()
-            print(newstr)
-            print(type(file))
-
-            # ext_filename = os.path.join(unziptodir, name)
-            # ext_filename = ext_filename.replace('\\', '/')
-            # print(ext_filename)
-            # ext_dir = os.path.dirname(ext_filename)
-            # if not os.path.exists(ext_dir):
-            #     os.mkdir(ext_dir)
-
-            # outfile = open(ext_filename, 'wb')
-            # outfile.write(zfobj.read(name))
-            # outfile.close()
-
-            # read(ext_filename)
 
 if __name__ == '__main__':
     # unzip_file('0001_c.zip', '/raw_test')

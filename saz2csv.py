@@ -28,7 +28,7 @@ def get_content(zipfilename):
             content = zfobj.read(name)  # 获取文件内容
 
             name_num = name.split('_')[0]
-            if name_num not in content_dict.keys():
+            if name_num not in content_dict.keys():  # 判断是否在字典中已存在条目
                 row_dict = {}
                 if 'c' in name:
                     row_dict = get_c_content(content)
@@ -36,6 +36,7 @@ def get_content(zipfilename):
                     row_dict = get_m_content(content)
                 if 's' in name:
                     row_dict = get_s_content(content)
+                # 若不存在就第一次获取内容后，添加第一次的条目（初始化）
                 content_dict[name_num] = row_dict
             else:
                 if 'c' in name:
@@ -44,7 +45,7 @@ def get_content(zipfilename):
                     row_dict = get_m_content(content)
                 if 's' in name:
                     row_dict = get_s_content(content)
-                content_dict[name_num].update(row_dict)
+                content_dict[name_num].update(row_dict)  # 若存在就对相应条目进行内容更新
 
     for key, value in sorted(content_dict.iteritems()):
         print key
@@ -107,7 +108,6 @@ def get_m_content(content):
     temp = content_list[len(content_list) - 1].strip().split(' ')
     host_ip = temp[2].strip('\"').split('=\"')[1]
     content_dict['host_ip'] = host_ip
-    print host_ip
     # print temp
 
     return content_dict

@@ -27,43 +27,30 @@ def get_content(zipfilename):
             continue
         else:
             content = zfobj.read(name)  # 获取文件内容
-            if name_num != name.split('_')[0]:
-                print cmp(name_num, name.split('_')[0])
-                name_num = name.split('_')[0]
-                row_dict['name_num'] = name.split('_')[0]
-                row_list.append(row_dict)
-                row_dict.clear()
-                if 'c' in name:
-                    print "Filename contains 'c'!!"
-                    # content = content.decode('gbk', 'ignore')
-                    row_dict.update(get_c_content(content))
-                    # continue
-                if 'm' in name:
-                    print "Filename contains 'm'!!"
-                    row_dict.update(get_m_content(content))
-                    # continue
-                if 's' in name:
-                    print "Filename contains 's'!!"
-                    row_dict.update(get_s_content(content))
 
+            name_num = name.split('_')[0]
+            if name_num not in content_dict.keys():
+                row_dict = {}
+                if 'c' in name:
+                    row_dict.update(get_c_content(content))
+                if 'm' in name:
+                    row_dict.update(get_m_content(content))
+                if 's' in name:
+                    row_dict.update(get_s_content(content))
+                content_dict[name_num] = row_dict
             else:
                 if 'c' in name:
-                    print "Filename contains 'c'!!"
-                    # content = content.decode('gbk', 'ignore')
                     row_dict.update(get_c_content(content))
-                    # continue
                 if 'm' in name:
-                    print "Filename contains 'm'!!"
                     row_dict.update(get_m_content(content))
-                    # continue
                 if 's' in name:
-                    print "Filename contains 's'!!"
                     row_dict.update(get_s_content(content))
-        # if row_dict not in row_list:
 
-    for i in row_list:
-        print str(i) + '\n'
-    # print row_list
+    # print sorted(content_dict.iteritems())
+    for key, value in sorted(content_dict.iteritems()):
+        print key
+        print value
+    # print content_dict
 
 
 def get_c_content(content):

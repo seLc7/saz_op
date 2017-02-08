@@ -30,7 +30,6 @@ def get_content(zipfilename):
             name_num = name.split('_')[0]
             if name_num not in content_dict.keys():
                 row_dict = {}
-                # print "if" + name
                 if 'c' in name:
                     row_dict = get_c_content(content)
                 if 'm' in name:
@@ -38,25 +37,18 @@ def get_content(zipfilename):
                 if 's' in name:
                     row_dict = get_s_content(content)
                 content_dict[name_num] = row_dict
-                # print "if" + str(row_dict)
             else:
-                # print "if" + name
                 if 'c' in name:
                     row_dict = get_c_content(content)
                 if 'm' in name:
                     row_dict = get_m_content(content)
-                    # print "m!!!!!!!!!!"
-                    # print row_dict
                 if 's' in name:
                     row_dict = get_s_content(content)
                 content_dict[name_num].update(row_dict)
-                # print "else" + str(row_dict)
 
-    # print sorted(content_dict.iteritems())
     for key, value in sorted(content_dict.iteritems()):
         print key
         print value
-    # print content_dict
 
 
 def get_c_content(content):

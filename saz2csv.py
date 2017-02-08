@@ -15,8 +15,11 @@ import zipfile
 def get_content(zipfilename):
     """获取文件内容"""
     zfobj = zipfile.ZipFile(zipfilename)
+    content_dict = dict()
     row_dict = dict()
     name_num = '0001'
+    row_list = []
+    print zfobj.namelist()
     for name in zfobj.namelist():
         name = name.replace('\\', '/')
         if name.endswith('/'):
@@ -25,28 +28,42 @@ def get_content(zipfilename):
         else:
             content = zfobj.read(name)  # 获取文件内容
             if name_num != name.split('_')[0]:
+                print cmp(name_num, name.split('_')[0])
                 name_num = name.split('_')[0]
+                row_dict['name_num'] = name.split('_')[0]
+                row_list.append(row_dict)
                 row_dict.clear()
-            if 'c' in name:
-                print "Filename contains 'c'!!"
+                if 'c' in name:
+                    print "Filename contains 'c'!!"
+                    # content = content.decode('gbk', 'ignore')
+                    row_dict.update(get_c_content(content))
+                    # continue
+                if 'm' in name:
+                    print "Filename contains 'm'!!"
+                    row_dict.update(get_m_content(content))
+                    # continue
+                if 's' in name:
+                    print "Filename contains 's'!!"
+                    row_dict.update(get_s_content(content))
 
-                # content = content.decode('gbk', 'ignore')
-                # content_list = content.split('\r\n')
-                # content_list = content_list[:len(content_list) - 2]
-                row_dict.update(get_c_content(content))
-                # print content_list
-                # print(type(content))
-            if 'm' in name:
-                # zfobj.
-                print "Filename contains 'm'!!"
-                # dom = xml.dom.minidom.psarseString(content)
-                # print dom
-                row_dict.update(get_m_content(content))
-            if 's' in name:
-                print "Filename contains 's'!!"
-                get_s_content(content)
+            else:
+                if 'c' in name:
+                    print "Filename contains 'c'!!"
+                    # content = content.decode('gbk', 'ignore')
+                    row_dict.update(get_c_content(content))
+                    # continue
+                if 'm' in name:
+                    print "Filename contains 'm'!!"
+                    row_dict.update(get_m_content(content))
+                    # continue
+                if 's' in name:
+                    print "Filename contains 's'!!"
+                    row_dict.update(get_s_content(content))
+        # if row_dict not in row_list:
 
-    print row_dict
+    for i in row_list:
+        print str(i) + '\n'
+    # print row_list
 
 
 def get_c_content(content):
@@ -57,18 +74,16 @@ def get_c_content(content):
     for item in content_list:
         if 'POST' in item:
             post = item.split(' ')[1]
+            content_dict['c_post'] = post
         if 'User-Agent' in item:
             user_agent = item.split(':')[1]
+            content_dict['c_user_agent'] = user_agent
         if 'Host' in item:
             host = item.split(':')[1]
+            content_dict['c_host'] = host
         if 'Content-Length' in item:
             content_length = item.split(':')[1]
-    # host = content_list[3].split(':')[1]
-    # content_length = content_list[6].split(':')[1]
-    content_dict['c_post'] = post
-    content_dict['c_user_agent'] = user_agent
-    content_dict['c_host'] = host
-    content_dict['c_content_length'] = content_length
+            content_dict['c_content_length'] = content_length
 
     # print post, user_agent, host, content_length
 
@@ -119,10 +134,12 @@ def get_s_content(content):
     for item in content_list:
         if 'Content-Length' in item:
             content_length = item.split(':')[1]
-            print content_length
+            content_dict['s_content_lenght'] = content_length
+            # print content_length
             break
-    content_dict['s_content_lenght'] = content_length
-    print content_list
+
+    # print content_list
+    return content_dict
 
 
 def unzip_file(zipfilename, unziptodir):

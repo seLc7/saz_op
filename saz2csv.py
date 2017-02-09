@@ -3,6 +3,8 @@
 # import sys
 # import os.path
 import zipfile
+from collections import OrderedDict, defaultdict
+
 # from read_c import read_c as read
 # zfile = zipfile.ZipFile('test.saz', 'r')
 # for filename in zfile.namelist():
@@ -15,8 +17,8 @@ import zipfile
 def get_content(zipfilename):
     """获取文件内容"""
     zfobj = zipfile.ZipFile(zipfilename)
-    content_dict = dict()
-    row_dict = dict()
+    content_dict = OrderedDict()
+    row_dict = {}
     name_num = '0001'
     # print zfobj.namelist()
     for name in zfobj.namelist():
@@ -47,9 +49,54 @@ def get_content(zipfilename):
                     row_dict = get_s_content(content)
                 content_dict[name_num].update(row_dict)  # 若存在就对相应条目进行内容更新
 
-    for key, value in sorted(content_dict.iteritems()):
-        print key
-        print value
+    # for key, value in sorted(content_dict.iteritems()):
+    #     print key
+    #     print value
+    for line in get_line_from_contentdict(content_dict):
+        print line
+
+
+def get_line_from_contentdict(content_dict):
+    """从contentdict中获取行信息，输出字符串"""
+    # print content_dict
+    for name_key in content_dict:
+        # print name_key
+        # print content_dict[name_key]
+        d = content_dict[name_key]
+        key_list = ['c_post', 'c_user_agent', 'c_host', 'c_content_length',
+                    'client_connected_time', 'client_done_request_time',
+                    'server_connected_time', 'client_done_response_time',
+                    's_content_lenght']
+        line = name_key + ':'
+        for key in key_list:
+            v = d.get(key, "N/A")
+            line += '\t' + v
+
+        yield line
+        # for content_key in content_dict[name_key]:
+        #     # print content_key
+        #     if content_key == 'c_post':
+        #         c_post = content_dict[name_key][content_key]
+        #     if content_key == 'c_user_agent':
+        #         c_user_agent = content_dict[name_key][content_key]
+        #     if content_key == 'c_host':
+        #         c_host = content_dict[name_key][content_key]
+        #     if content_key == 'c_content_length':
+        #         c_content_length = content_dict[name_key][content_key]
+
+        #     if content_key == 'client_connected_time':
+        #         client_connected_time = content_dict[name_key][content_key]
+        #     if content_key == 'client_done_request_time':
+        #         client_done_request_time = content_dict[name_key][content_key]
+        #     if content_key == 'server_connected_time':
+        #         server_connected_time = content_dict[name_key][content_key]
+        #     if content_key == 'client_done_response_time':
+        # client_done_response_time = content_dict[name_key][content_key]
+
+        #     if content_key == 's_content_lenght':
+        #         s_content_lenght = content_dict[name_key][content_key]
+
+        # y
 
 
 def get_c_content(content):

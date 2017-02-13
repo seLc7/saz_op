@@ -23,7 +23,8 @@ def get_content(zipfilename):
     # print zfobj.namelist()
     for name in zfobj.namelist():
         name = name.replace('\\', '/')
-        if name.endswith('/'):
+        if name.endswith('/') or name == '[Content_Types].xml' \
+                or name.endswith('.htm'):
             # os.mkdir(os.path.join(unziptodir, name))
             continue
         else:
@@ -52,8 +53,13 @@ def get_content(zipfilename):
     # for key, value in sorted(content_dict.iteritems()):
     #     print key
     #     print value
+    out_file = open('data.txt', 'w')
+
     for line in get_line_from_contentdict(content_dict):
         print line
+        out_file.write(line + '\r\n')
+
+    out_file.close()
 
 
 def get_line_from_contentdict(content_dict):
@@ -68,10 +74,11 @@ def get_line_from_contentdict(content_dict):
                     'server_connected_time', 'client_done_response_time',
                     's_content_lenght']
         line = name_key + ':'
+        # line = ''
         for key in key_list:
-            v = d.get(key, "N/A")
-            line += '\t' + v
-
+            v = d.get(key, "N/A")  # 获取key键的值，若没有该key，则赋值为N/A
+            # line += '\t' + v
+            line += v + ','
         yield line
         # for content_key in content_dict[name_key]:
         #     # print content_key

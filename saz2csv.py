@@ -4,6 +4,7 @@
 # import os.path
 import zipfile
 from collections import OrderedDict, defaultdict
+from datetime import datetime
 
 # from read_c import read_c as read
 # zfile = zipfile.ZipFile('test.saz', 'r')
@@ -77,9 +78,16 @@ def get_line_from_contentdict(content_dict):
         # line = ''
         for key in key_list:
             v = d.get(key, "N/A")  # 获取key键的值，若没有该key，则赋值为N/A
+
+            if key == 'client_connected_time':
+                first_time = time_format(v[:-1])  # 小数点后只有6位有效可运算
+            if key == 'client_done_response_time':
+                last_time = time_format(v[:-1])
             # line += '\t' + v
             line += v + ','
-        yield line
+        time_flow_length = (last_time - first_time).total_seconds()
+        # print last_time - first_time
+        yield line + str(time_flow_length)
         # for content_key in content_dict[name_key]:
         #     # print content_key
         #     if content_key == 'c_post':
@@ -165,6 +173,15 @@ def get_m_content(content):
     # print temp
 
     return content_dict
+
+
+def time_format(time):
+    """字符串转换格式为时间"""
+    # print time
+    date_time = datetime.strptime(
+        time, '%H:%M:%S.%f') - datetime(1900, 1, 1)  # 不减会自动生成年月日为1900-01-01
+    # print date_time
+    return date_time
 
 
 def get_s_content(content):

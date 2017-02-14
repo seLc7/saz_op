@@ -55,7 +55,10 @@ def get_content(zipfilename):
     #     print key
     #     print value
     out_file = open('data.txt', 'w')
-
+    out_file.write('c_POST,c_User-Agent,c_Host,c_Content-Length,\
+                        c_Connected-Time,c_Done-Request-Time,\
+                        s_Connected-Time,c_Done-Response-Time,\
+                        s_Content-Lenght,Time-Flow-Length')
     for line in get_line_from_contentdict(content_dict):
         print line
         out_file.write(line + '\r\n')
@@ -82,6 +85,7 @@ def get_line_from_contentdict(content_dict):
             if key == 'client_connected_time':
                 first_time = time_format(v[:-1])  # 小数点后只有6位有效可运算
             if key == 'client_done_response_time':
+                print v
                 last_time = time_format(v[:-1])
             # line += '\t' + v
             line += v + ','
@@ -123,15 +127,19 @@ def get_c_content(content):
         if 'POST' in item:
             post = item.split(' ')[1]
             content_dict['c_post'] = post
+            continue
         if 'User-Agent' in item:
             user_agent = item.split(':')[1]
             content_dict['c_user_agent'] = user_agent
+            continue
         if 'Host' in item:
             host = item.split(':')[1]
             content_dict['c_host'] = host
+            continue
         if 'Content-Length' in item:
             content_length = item.split(':')[1]
             content_dict['c_content_length'] = content_length
+            continue
 
     # print post, user_agent, host, content_length
 
@@ -141,36 +149,72 @@ def get_c_content(content):
 def get_m_content(content):
     """获取包含‘m’字符文件的内容"""
     content_dict = dict()
-    time_list = []
+    # time_list = []
     content_list = content.split('\r\n')
-    content_list = content_list[2:len(content_list) - 2]
+    # host_ip = ''
+
+    # content_list = content_list[2:len(content_list) - 2]
     # print content_list
-    # 获取时间
-    temp = content_list[0].strip().split(' ')
 
-    for i in temp[1:5]:
-        time = i.strip('\"').strip('+08:00').split('T')[1]
-        # if time not in time_list:
-        time_list.append(time)
-    for i in temp[9:len(temp) - 1]:
-        time = i.strip('\"').strip('+08:00').split('T')[1]
-        time_list.append(time)
-    # print time_list
+    for item in content_list:
+        if 'SessionTimers' in item:
+            # 获取时间
+            temp = item.strip().split(' ')
+            # print temp
+            for element in temp:
+                if 'ClientConnected' in element:
+                    content_dict['client_connected_time'] = \
+                        element.strip('\"').strip('+08:00').split('T')[1]
+                    continue
+                if 'ClientDoneResponse' in element:
+                    content_dict['client_done_response_time'] = \
+                        element.strip('\"').strip('+08:00').split('T')[1]
+                    continue
+            continue
+            # for i in temp[1:5]:
+            #     time = i.strip('\"').strip('+08:00').split('T')[1]
+            #     time_list.append(time)
+            #     print i
+            # for i in temp[9:len(temp) - 1]:
+            #     time = i.strip('\"').strip('+08:00').split('T')[1]
+            #     time_list.append(time)
+            #     print i
+            # print time_list
 
-    content_dict['client_connected_time'] = time_list[0]
-    content_dict['client_done_request_time'] = time_list[3]
-    content_dict['server_connected_time'] = time_list[4]
-    content_dict['client_done_response_time'] = time_list[9]
+        if 'x-hostip' in item:
+            temp = item.strip().split(' ')
+            content_dict['host_ip'] = temp[2].strip('\"').split('=\"')[1]
+            continue
+
+    # # 获取时间
+    # temp = content_list[0].strip().split(' ')
+
+    # for i in temp[1:5]:
+    #     time = i.strip('\"').strip('+08:00').split('T')[1]
+    #     # if time not in time_list:
+    #     time_list.append(time)
+    # for i in temp[9:len(temp) - 1]:
+    #     time = i.strip('\"').strip('+08:00').split('T')[1]
+    #     time_list.append(time)
+    # # print time_list
+
+    # content_dict['client_connected_time'] = time_list[0]
+    # content_dict['client_done_request_time'] = time_list[3]
+    # content_dict['server_connected_time'] = time_list[4]
+    # content_dict['client_done_response_time'] = time_list[9]
 
     # temp = content_list[len(content_list) - 3].strip().split(' ')
     # egress_port = temp[2].strip('\"').split('=\"')[1]
     # # print egress_port
     # content_dict['egress_port'] = egress_port
 
-    temp = content_list[len(content_list) - 1].strip().split(' ')
-    host_ip = temp[2].strip('\"').split('=\"')[1]
-    content_dict['host_ip'] = host_ip
+    # temp = content_list[len(content_list) - 1].strip().split(' ')
+    # host_ip = temp[2].strip('\"').split('=\"')[1]
+    # content_dict['host_ip'] = host_ip
     # print temp
+
+    # print 'connected_time:' + content_dict['client_connected_time']
+    # print 'done_time:' + content_dict['client_done_response_time']
 
     return content_dict
 
@@ -201,4 +245,4 @@ def get_s_content(content):
 
 if __name__ == '__main__':
     # unzip_file('0001_c.zip', '/raw_test')
-    get_content('0001_c.zip')
+    get_content('test.saz')

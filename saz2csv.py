@@ -3,7 +3,7 @@
 # import sys
 # import os.path
 import zipfile
-from collections import OrderedDict, defaultdict
+from collections import OrderedDict
 from datetime import datetime
 
 # from read_c import read_c as read
@@ -55,10 +55,10 @@ def get_content(zipfilename):
     #     print key
     #     print value
     out_file = open('data.txt', 'w')
-    out_file.write('c_POST,c_User-Agent,c_Host,c_Content-Length,\
-                        c_Connected-Time,c_Done-Request-Time,\
-                        s_Connected-Time,c_Done-Response-Time,\
-                        s_Content-Lenght,Time-Flow-Length')
+    out_file.write('c_POST, c_User-Agent, c_Host, c_Content-Length, ' +
+                   'c_Connected-Time, c_Done-Request-Time, s_Connected-Time, ' +
+                   'c_Done-Response-Time, s_Content-Lenght, Time-Flow-Length' +
+                   '\r\n')
     for line in get_line_from_contentdict(content_dict):
         print line
         out_file.write(line + '\r\n')
@@ -89,7 +89,7 @@ def get_line_from_contentdict(content_dict):
                 last_time = time_format(v[:-1])
             # line += '\t' + v
             line += v + ','
-        time_flow_length = (last_time - first_time).total_seconds()
+        time_flow_length = (last_time - first_time).total_seconds()  # 获取秒级时长
         # print last_time - first_time
         yield line + str(time_flow_length)
         # for content_key in content_dict[name_key]:

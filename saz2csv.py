@@ -89,7 +89,7 @@ def get_line_from_contentdict(content_dict):
                 last_time = time_format(v[:-1])
             # line += '\t' + v
             line += v + ','
-        time_flow_length = (last_time - first_time).total_seconds()  # 获取秒级时长
+        time_flow_length = (last_time - first_time).total_seconds()  # 获取秒级通信时长
         # print last_time - first_time
         yield line + str(time_flow_length)
         # for content_key in content_dict[name_key]:
@@ -166,10 +166,19 @@ def get_m_content(content):
                     content_dict['client_connected_time'] = \
                         element.strip('\"').strip('+08:00').split('T')[1]
                     continue
+                if 'ClientDoneRequest' in element:
+                    content_dict['client_done_request_time'] = \
+                        element.strip('\"').strip('+08:00').split('T')[1]
+                    continue
+                if 'ServerConnected' in element:
+                    content_dict['server_connected_time'] = \
+                        element.strip('\"').strip('+08:00').split('T')[1]
+                    continue
                 if 'ClientDoneResponse' in element:
                     content_dict['client_done_response_time'] = \
                         element.strip('\"').strip('+08:00').split('T')[1]
                     continue
+
             continue
             # for i in temp[1:5]:
             #     time = i.strip('\"').strip('+08:00').split('T')[1]
